@@ -122,7 +122,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         //child: Text(
                           //  'Ссылка на репозиторий'
                         //),
-                       const SelectableText('Ссылка на репозиторий',
+                       const SelectableText('https://github.com/ElizavetaNova/where_to_eat.git',
                               cursorColor: Colors.red,
                               showCursor: true,
                               toolbarOptions: ToolbarOptions(
