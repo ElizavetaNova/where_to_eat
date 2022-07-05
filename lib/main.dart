@@ -1,10 +1,28 @@
+import 'dart:async';
+import 'dart:convert';
+import './restaurant.dart';
 
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'package:json_server/json_server.dart';
 
 void main() {
   runApp(const MyApp());
 }
+Future<Restaurant> fetchRestaurant() async{
+  final response = await http
+      .get(Uri.parse('https://jsonplaceholder.typicode.com/albums/1'));
 
+  if (response.statusCode == 200) {
+    // If the server did return a 200 OK response,
+    // then parse the JSON.
+    return Restaurant.fromJson(jsonDecode(response.body));
+  } else {
+    // If the server did not return a 200 OK response,
+    // then throw an exception.
+    throw Exception('Failed to load album');
+  }
+}
 List<String> viewKitchens = [
   "Китайская",
   "Итальянская",
@@ -224,12 +242,36 @@ CardRestaurant rest2 = CardRestaurant('CO-co', 'суворова 3', 'chinese', 
 List<CardRestaurant> listRestaurant = [rest1, rest2];
 
 class _ChooseRestaurantState extends State<ChooseRestaurant> {
+  late Future<Restaurant> futureRestaurant;
   String nameFont = 'Comforta';
+  @override
+  void initState() {
+    super.initState();
+    futureRestaurant = fetchRestaurant();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(title: Text('Выбор заведения')),
-        body: Stack(
+        body:
+        Center(
+          child: FutureBuilder<Restaurant>(
+            future: futureRestaurant,
+            builder: (context, snapshot) {
+              if (snapshot.hasData) {
+                return Text(snapshot.data!.name);
+              } else if (snapshot.hasError) {
+                return Text('${snapshot.error}');
+              }
+
+              // By default, show a loading spinner.
+              return const CircularProgressIndicator();
+            },
+          ),
+        ),
+
+        /*Stack(
             children: <Widget>[ Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
@@ -272,7 +314,8 @@ class _ChooseRestaurantState extends State<ChooseRestaurant> {
                     ),
                   ),
 
-            ])]));
+            ])])*/
+    );
   }
 }
 
