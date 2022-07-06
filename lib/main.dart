@@ -4,22 +4,21 @@ import './restaurant.dart';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:json_server/json_server.dart';
 
 void main() {
   runApp(const MyApp());
 }
 Future<Restaurant> fetchRestaurant() async{
+  //List<Restaurant> restaurant;
   final response = await http
-      .get(Uri.parse('https://jsonplaceholder.typicode.com/albums/1'));
+      .get(Uri.parse('http://10.0.2.2:3000/rests'));
 
   if (response.statusCode == 200) {
-    // If the server did return a 200 OK response,
-    // then parse the JSON.
+    //restaurant=(json.decode(response.body) as List).map((i) =>
+        //Restaurant.fromJson(i)).toList();
     return Restaurant.fromJson(jsonDecode(response.body));
+    //return restaurant;
   } else {
-    // If the server did not return a 200 OK response,
-    // then throw an exception.
     throw Exception('Failed to load album');
   }
 }
