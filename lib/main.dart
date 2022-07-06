@@ -8,20 +8,7 @@ import 'package:http/http.dart' as http;
 void main() {
   runApp(const MyApp());
 }
-Future<Restaurant> fetchRestaurant() async{
-  //List<Restaurant> restaurant;
-  final response = await http
-      .get(Uri.parse('http://10.0.2.2:3000/rests'));
 
-  if (response.statusCode == 200) {
-    //restaurant=(json.decode(response.body) as List).map((i) =>
-        //Restaurant.fromJson(i)).toList();
-    return Restaurant.fromJson(jsonDecode(response.body));
-    //return restaurant;
-  } else {
-    throw Exception('Failed to load album');
-  }
-}
 List<String> viewKitchens = [
   "Китайская",
   "Итальянская",
@@ -65,21 +52,7 @@ class Palette {
   );
 }
 
-class CardRestaurant {
-  String? name;
-  String? address;
-  //Image? photo;
-  String? kitchen;
-  int? rating;
-  CardRestaurant(String nameRes, addressRes,
-      /*Image photoRes,*/ String kitchenRes, int ratingRes) {
-    name = nameRes;
-    address = addressRes;
-    //photo = photoRes;
-    kitchen = kitchenRes;
-    rating = ratingRes;
-  }
-}
+
 
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
@@ -236,12 +209,23 @@ class ChooseRestaurant extends StatefulWidget {
   _ChooseRestaurantState createState() => _ChooseRestaurantState();
 }
 
-CardRestaurant rest1 = CardRestaurant('Rococo', 'суворова 3', 'chinese', 3);
-CardRestaurant rest2 = CardRestaurant('CO-co', 'суворова 3', 'chinese', 3);
-List<CardRestaurant> listRestaurant = [rest1, rest2];
-
 class _ChooseRestaurantState extends State<ChooseRestaurant> {
-  late Future<Restaurant> futureRestaurant;
+  Future<List<Restaurant>> fetchRestaurant() async {
+    List<Restaurant> restaurant;
+    final response = await http.get(Uri.parse('http://10.0.2.2:3000/rests'));
+
+    if (response.statusCode == 200) {
+      restaurant = (json.decode(response.body) as List)
+          .map((i) => Restaurant.fromJson(i))
+          .toList();
+      //return Restaurant.fromJson(jsonDecode(response.body));
+      return restaurant;
+    } else {
+      throw Exception('Failed to load album');
+    }
+  }
+
+  late Future<List<Restaurant>> futureRestaurant;
   String nameFont = 'Comforta';
   @override
   void initState() {
@@ -253,68 +237,57 @@ class _ChooseRestaurantState extends State<ChooseRestaurant> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(title: Text('Выбор заведения')),
-        body:
-        Center(
-          child: FutureBuilder<Restaurant>(
-            future: futureRestaurant,
-            builder: (context, snapshot) {
-              if (snapshot.hasData) {
-                return Text(snapshot.data!.name);
-              } else if (snapshot.hasError) {
-                return Text('${snapshot.error}');
-              }
-
-              // By default, show a loading spinner.
-              return const CircularProgressIndicator();
-            },
-          ),
-        ),
-
-        /*Stack(
-            children: <Widget>[ Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-              Expanded(
-                  child: ListView.builder(
-                itemBuilder: (context, position) {
-                  return Card(
-                    child: Text(
-                      listRestaurant[position].name.toString(),
-                      style: TextStyle(
-                        color: Palette.kToDark.shade800,
-                        fontSize: 27,
-                        fontStyle: FontStyle.normal,
-                        fontFamily: nameFont,
-                      ),
-                    ),
+        body: Stack(children: <Widget>[
+          Column(crossAxisAlignment: CrossAxisAlignment.start, children: <
+              Widget>[
+            Expanded(
+                child: FutureBuilder<List<Restaurant>>(
+              future: futureRestaurant,
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  return ListView.builder(
+                    itemCount: snapshot.data!.length,
+                    itemBuilder: (BuildContext context, int index) {
+                      return ListTile(
+                          title: Text(snapshot.data![index].name,
+                              style: TextStyle(
+                                color: Palette.kToDark.shade800,
+                                fontSize: 27,
+                                fontStyle: FontStyle.normal,
+                                fontFamily: nameFont,
+                              )));
+                    },
                   );
-                },
-                itemCount: listRestaurant.length,
-              )),
-                  Align(
-                    alignment: Alignment.bottomCenter,
-                    child: Container(
-                      margin: EdgeInsets.symmetric(horizontal: 20, vertical: 40),
-                      width: double.infinity,
-                      child: ElevatedButton(
-                        child: Text('Случайный выбор', style: TextStyle(fontSize: 24)),
-                        onPressed: () => {},
-                        style: ElevatedButton.styleFrom(
-                            onPrimary: Colors.black87,
-                            primary: Palette.buttonShades.shade100,
-                            minimumSize: Size(350, 50),
-                            padding: EdgeInsets.symmetric(horizontal: 30, vertical: 20),
-                            shape: const RoundedRectangleBorder(
-                              borderRadius: BorderRadius.all(Radius.circular(200)),
-                            )),
-                        //color: Colors.green,
-                        //textColor: Colors.white,
-                      ),
-                    ),
-                  ),
-
-            ])])*/
-    );
+                } else if (snapshot.hasError) {
+                  return Text('${snapshot.error}');
+                }
+                // By default, show a loading spinner.
+                return const CircularProgressIndicator();
+              },
+            )),
+            Align(
+              alignment: Alignment.bottomCenter,
+              child: Container(
+                margin: EdgeInsets.symmetric(horizontal: 20, vertical: 40),
+                width: double.infinity,
+                child: ElevatedButton(
+                  child:
+                      Text('Случайный выбор', style: TextStyle(fontSize: 24)),
+                  onPressed: () => {},
+                  style: ElevatedButton.styleFrom(
+                      onPrimary: Colors.black87,
+                      primary: Palette.buttonShades.shade100,
+                      minimumSize: Size(350, 50),
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 30, vertical: 20),
+                      shape: const RoundedRectangleBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(200)),
+                      )),
+                ),
+              ),
+            ),
+          ])
+        ]));
   }
 }
 

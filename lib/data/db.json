@@ -1,12 +1,25 @@
 {
   "rests": [
     {
-      "name": "ludo",
-      "address": "ghj"
+      "name": "Co-co",
+      "address": "Пушкина, 50",
+      "photo":"",
+      "kitchen": "итальянская",
+      "rating": 4
     },
     {
-      "name": "ludo2",
-      "address": "2"
+      "name": "Dodo",
+      "address": "Карла-Маркса, 25",
+      "photo":"",
+      "kitchen": "итальянская",
+      "rating": 5
+    },
+    {
+      "name": "Мускатный Кит",
+      "address": "Карла-Маркса, 25",
+      "photo":"",
+      "kitchen": "итальянская",
+      "rating": 3
     }
   ]
 }
